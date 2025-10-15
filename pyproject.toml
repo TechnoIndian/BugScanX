@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "BugScan"
+dynamic = ["version"]
+authors = [
+  { name = "RK_TECHNO_INDIA", email = "TechnoIndian786@gmail.com" }
+]
+
+description = "Bug Scanner for Internet Freedom"
+
+license = { text = "MIT" }
+readme = "README.md"
+
+requires-python = ">=3.7"
+
+dependencies = [
+    "requests",
+    "bs4",
+    "ping3",
+    "tabulate"
+]
+
+keywords = ["BugScanX"]
+
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+BugScanX = "BugScanX.BugScanX:RK_TECHNO_INDIA"
+bugscanx = "BugScanX.BugScanX:RK_TECHNO_INDIA"
+
+[project.urls]
+Homepage = "https://github.com/TechnoIndian/BugScanX"
+Repository = "https://github.com/TechnoIndian/BugScanX.git"
+Issues = "https://github.com/TechnoIndian/BugScanX/issues"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages.find = {}
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
