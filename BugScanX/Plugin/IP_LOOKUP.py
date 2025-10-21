@@ -1,8 +1,9 @@
-from ..C_M import CM; C = CM()
+from ..ANSI_COLORS import ANSI; C = ANSI()
+from ..MODULES import IMPORT; M = IMPORT()
 from ..OUTPUT import out_dir
 
 
-# ————— isExtrect Domain —————
+# ————— 𝐢𝐬𝐄𝐱𝐭𝐫𝐞𝐜𝐭 𝐃𝐨𝐦𝐚𝐢𝐧 —————
 def isExtrect(soup):
 
     return {
@@ -12,7 +13,7 @@ def isExtrect(soup):
     }
 
 
-# ————— REVERSE IP LOOKUP with RapidDNS —————
+# ————— 𝐑𝐄𝐕𝐄𝐑𝐒𝐄 𝐈𝐏 𝐋𝐎𝐎𝐊𝐔𝐏 𝐰𝐢𝐭𝐡 𝐑𝐚𝐩𝐢𝐝𝐃𝐍𝐒 —————
 def RapidDNS(IP):
 
     domains = set()
@@ -20,23 +21,23 @@ def RapidDNS(IP):
     print(f"\n{C.INFO}{C.C} Reverse IP LookUp with RapidDNS\n")
 
     try:
-        response = C.requests.get(f"https://rapiddns.io/s/{IP}?full=1&down=1")
+        response = M.requests.get(f"https://rapiddns.io/s/{IP}?full=1&down=1")
 
         if response.ok:
-            soup = C.BeautifulSoup(response.content, 'html.parser')
+            soup = M.BeautifulSoup(response.content, 'html.parser')
 
             domains.update(isExtrect(soup))
 
-        print(f"{C.P}   |\n   ╰{C.R} Total ┈{C.OG}➢ {C.PN}{len(domains)}  {C.G}Domains / IPs\n")
+        print(f"{C.P}   |\n   ╰{C.CC} Total ┈{C.OG}➢ {C.PN}{len(domains)}  {C.G}Domains / IPs\n")
 
         return domains
 
-    except C.requests.exceptions.RequestException as e:
+    except M.requests.exceptions.RequestException as e:
         print(f"\n{C.ERROR} Please Check Your Internet Connect & Try Again\n")
         return set()
 
 
-# ————— REVERSE IP LOOKUP with YouGetSignal —————
+# ————— 𝐑𝐄𝐕𝐄𝐑𝐒𝐄 𝐈𝐏 𝐋𝐎𝐎𝐊𝐔𝐏 𝐰𝐢𝐭𝐡 𝐘𝐨𝐮𝐆𝐞𝐭𝐒𝐢𝐠𝐧𝐚𝐥 —————
 def YouGetSignal(IP):
 
     domains = set()
@@ -44,7 +45,7 @@ def YouGetSignal(IP):
     print(f"\n{C.INFO}{C.C} Reverse IP LookUp with YouGetSignal\n")
 
     try:
-        response = C.requests.post('https://domains.yougetsignal.com/domains.php', data={'remoteAddress': IP})
+        response = M.requests.post('https://domains.yougetsignal.com/domains.php', data={'remoteAddress': IP})
 
         if response.ok:
 
@@ -52,16 +53,16 @@ def YouGetSignal(IP):
                 domain[0] for domain in response.json().get('domainArray', [])
             )
 
-        print(f"{C.P}   |\n   ╰{C.R} Total ┈{C.OG}➢ {C.PN}{len(domains)}  {C.G}Domains / IPs\n")
+        print(f"{C.P}   |\n   ╰{C.CC} Total ┈{C.OG}➢ {C.PN}{len(domains)}  {C.G}Domains / IPs\n")
 
         return domains
 
-    except C.requests.exceptions.RequestException as e:
+    except M.requests.exceptions.RequestException as e:
         print(f"\n{C.ERROR} Please Check Your Internet Connect & Try Again\n")
         return set()
 
 
-# ————— REVERSE IP LOOKUP —————
+# ————— 𝐑𝐄𝐕𝐄𝐑𝐒𝐄 𝐈𝐏 𝐋𝐎𝐎𝐊𝐔𝐏 —————
 def REVERSE_IP_LOOKUP(IP):
 
     print(f"\n{C.X}{C.C} Reverse IP LookUp\n\n"
@@ -76,7 +77,7 @@ def REVERSE_IP_LOOKUP(IP):
     all_IPs.update(RapidDNS(IP))
     all_IPs.update(YouGetSignal(IP))
 
-    print(f"{C.R}{'_' * 61}\n\n"
+    print(f"{C.CC}{'_' * 61}\n\n"
         f"\n{C.INFO} {C.C}FINAL UNIQUE IPs\n")
 
     with open(Output_Path, "w") as f:
@@ -86,6 +87,8 @@ def REVERSE_IP_LOOKUP(IP):
 
             f.write(f"{IPs}\n")
 
-    print(f"\n\n{C.S}{C.Y} OUTPUT {C.E} {C.PN}{len(all_IPs)} {C.C} IPs : {C.Y}{Output_Path} {C.G}✔\n")
-
-    exit(0)
+    exit(
+        f"\n{C.CC}{'_' * 61}\n\n"
+        f"\n{C.S}{C.C} Total Reverse IPs {C.E} {C.OG}︻デ═一 {C.PN}{len(all_IPs)}\n"
+        f"{C.P}         |\n         ╰{C.CC} OUTPUT ┈{C.OG}➢ {C.Y}{Output_Path} {C.G}✔\n"
+    )

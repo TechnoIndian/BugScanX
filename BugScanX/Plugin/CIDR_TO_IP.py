@@ -1,12 +1,13 @@
-from ..C_M import CM; C = CM()
+from ..ANSI_COLORS import ANSI; C = ANSI()
+from ..MODULES import IMPORT; M = IMPORT()
 from ..OUTPUT import out_dir
 
 
-# ————— CIDR TO IP —————
+# ————— 𝐂𝐈𝐃𝐑 𝐓𝐎 𝐈𝐏 —————
 def CIDR_TO_IP(CIDR):
 
     try:
-        IP_Range = C.ipaddress.ip_network(CIDR, strict=False)
+        IP_Range = M.ipaddress.ip_network(CIDR, strict=False)
 
         IP_List = [str(IP) for IP in IP_Range]
 
@@ -18,7 +19,10 @@ def CIDR_TO_IP(CIDR):
             for IPs in IP_List:
                 f.write(IPs + "\n")
 
-        exit(f"\n{C.X} {C.C} {CIDR} To IPs {C.R}= {C.PN}{len(IP_List)} {C.OG}➸❥ {C.Y}'{OUTPUT}' {C.G}✔\n")
+        exit(
+            f"\n{C.S}{C.C} CIDR To IPs {C.E}{C.C} {CIDR} {C.OG}➸❥ {C.PN}{len(IP_List)}\n"
+            f"{C.P}        |\n        ╰{C.CC} OUTPUT ┈{C.OG}➢ {C.Y}{OUTPUT} {C.G}✔\n"
+        )
 
     except ValueError as e:
         print(f"\n{C.ERROR} ✘ Invalid CIDR : {e}\n")

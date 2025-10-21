@@ -1,17 +1,18 @@
-from ..C_M import CM; C = CM()
+from ..ANSI_COLORS import ANSI; C = ANSI()
+from ..MODULES import IMPORT; M = IMPORT()
 from ..OUTPUT import out_dir
 from ..Logger import logger
 
 
-# ————— CHECK RESPONSE —————
-def CHECK_RESPONSE(USER_INPUT, isTime):
+# ————— 𝐂𝐇𝐄𝐂𝐊 𝐑𝐄𝐒𝐏𝐎𝐍𝐒𝐄 —————
+def CHECK_RESPONSE(HOSTS, isTime):
 
-    print(f"\n{C.X}{C.C} Host/Domain/IP to Header Response...\n")
+    print(f"\n{C.X}{C.C} CIDR / IP / Host ( Domain & SubDomain ) Header Response...\n")
 
     def CHECK_RESPONSE_STATUS(URL):
 
         try:
-            RS = C.requests.get(URL, timeout=1)
+            RS = M.requests.get(URL, timeout=3)
 
             return {
                 "Host": URL,
@@ -22,62 +23,54 @@ def CHECK_RESPONSE(USER_INPUT, isTime):
                 ]}
             }
 
-        except C.requests.RequestException as e:
+        except M.requests.RequestException as e:
             return None
 
-    entries = []
-
-    for input in USER_INPUT:
-
-        if input.endswith('.txt'):
-
-            with open(input) as file:
-                entries.extend([entry.strip() for entry in file if entry.strip()])
-
-        else:
-            entries.append(input)
-
-
     Output_Path = out_dir("response.txt")
+    
+    Total_HOST = len(HOSTS)
 
-    Total_HOST = len(entries)
+    Scanned_HOST = Respond_HOST = 0
 
-    Current_Host = 0
+    Start_Time = M.time.time()
 
-    Start_Time = C.time.time()
+    with open(Output_Path, 'w') as file:
+        
+        with M.ThreadPoolExecutor(max_workers=64) as executor:
 
-    with open(Output_Path, 'w') as outfile:
-        with C.ThreadPoolExecutor(max_workers=10) as executor:
+            isRequest = {}
 
-            SCAN_HOST = {
-                executor.submit(CHECK_RESPONSE_STATUS, f'https://{entry}'): entry
-                for entry in entries
-            }
+            for HOST in HOSTS:
+                Request = executor.submit(CHECK_RESPONSE_STATUS, f'https://{HOST}')
+                isRequest[Request] = HOST
 
-            Scanned_HOST = 0
-
-            for HOST in C.as_completed(SCAN_HOST):
+            for isHOST in M.as_completed(isRequest):
                 Scanned_HOST += 1
-                result = HOST.result()
+                CURRENT_HOST = isRequest[isHOST]
+                result = isHOST.result()
 
                 if result:
-                    Current_Host += 1
-
-                    print(f'\n')
+                    Respond_HOST += 1
+                    
+                    print(f"{C.CL}{C.CC}{'_' * 61}\n")
 
                     for key, value in result.items():
-                        print(f"{C.Y}{key} : {C.G}{value}")
+                        print(f"\r{C.CL}{C.Y}{key} : {C.G}{value}")
 
-                        outfile.write(f"{key} : {value}\n")
+                        file.write(f"{key} : {value}\n")
 
-                    outfile.write("\n")
+                    file.write("\n")
 
                 progress_line = (
-                    f"{C.R}PC - {C.P}{(Scanned_HOST / Total_HOST) * 100:.2f}% {C.R}"
-                    f"- SN -{C.P}{Scanned_HOST}/{C.Y}{Total_HOST} {C.R}"
-                    f"- RS - {C.G}{Current_Host} {C.P}<{isTime(C.time.time() - Start_Time)}> {C.R}"
+                    f"- PC - {(Scanned_HOST / Total_HOST) * 100:.2f}% "
+                    f"- SN -{Scanned_HOST}/{Total_HOST} "
+                    f"- RS - {Respond_HOST} <{isTime(M.time.time() - Start_Time)}> "
+                    f"- {CURRENT_HOST}"
                 )
 
                 logger(progress_line)
 
-    exit(f"\n\n{C.X}{C.C} Results Saved {C.OG}︻デ═一 {C.Y}{Output_Path} {C.G}✔\n")
+    exit(
+        f"{C.CC}{'_' * 61}\n\n"
+        f"\n{C.S}{C.C} OUTPUT {C.E} {C.OG}︻デ═一 {C.Y}{Output_Path} {C.G}✔\n"
+    )
