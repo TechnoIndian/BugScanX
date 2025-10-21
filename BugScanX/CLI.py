@@ -1,9 +1,6 @@
 from .ANSI_COLORS import ANSI; C = ANSI()
 from .MODULES import IMPORT; M = IMPORT()
 
-from .ANSI_COLORS import ANSI; C = ANSI()
-from .MODULES import IMPORT; M = IMPORT()
-
 
 # ————— 𝐩𝐚𝐫𝐬𝐞 𝐚𝐫𝐠𝐮𝐦𝐞𝐧𝐭𝐬 —————
 def parse_arguments():
