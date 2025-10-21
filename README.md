@@ -37,12 +37,6 @@
 [![GitHub](https://img.shields.io/badge/GitHub-%2312100E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/FreeNetLabs/BugScanX)
 
 
-Install
--------
-
-[![PyPI](https://img.shields.io/badge/pypi-%233775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/BugScan)
-
-
 IPv4 & IPv6 Subnet Size Reference Table
 -------
 `❗ Be careful with IPv6 Scans, I wouldn't recommend scanning CIDR over 1 million number of IP ☠️`
@@ -50,6 +44,12 @@ IPv4 & IPv6 Subnet Size Reference Table
 | IPv4                                      | IPv6                                      |
 |-------------------------------------------|-------------------------------------------|
 | [![IPv4](https://img.shields.io/badge/IPv4-%238A2BE2?style=for-the-badge&logo=internet-explorer&logoColor=white)](https://technoindian.github.io/BugScanX/assets/IPv4.html) | [![IPv6](https://img.shields.io/badge/IPv6-%238A2BE2?style=for-the-badge&logo=internet-explorer&logoColor=white)](https://technoindian.github.io/BugScanX/assets/IPv6.html) |
+
+
+Install
+-------
+
+[![PyPI](https://img.shields.io/badge/pypi-%233775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/BugScan)
 
 
 **BugScanX**
