@@ -42,6 +42,16 @@ Install
 
 [![PyPI](https://img.shields.io/badge/pypi-%233775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/BugScan)
 
+
+IPv4 & IPv6 Subnet Size Reference Table
+-------
+`❗ Be careful with IPv6 Scans, I wouldn't recommend scanning CIDR over 1 million number of IP ☠️`
+
+| IPv4                                      | IPv6                                      |
+|-------------------------------------------|-------------------------------------------|
+| [![IPv4](https://img.shields.io/badge/IPv4-%238A2BE2?style=for-the-badge&logo=internet-explorer&logoColor=white)](https://technoindian.github.io/BugScanX/assets/IPv4.html) | [![IPv6](https://img.shields.io/badge/IPv6-%238A2BE2?style=for-the-badge&logo=internet-explorer&logoColor=white)](https://technoindian.github.io/BugScanX/assets/IPv6.html) |
+
+
 **BugScanX**
 
     pip install BugScan
@@ -51,72 +61,91 @@ Updating
 
     pip install --upgrade BugScan
 
-Usage
+
+# Usage Example
+
+
+BugScanX ( File Mode )
 -----
 
 **BugScanX**
 
 
-**Mode -f ( File_Path )**
+**Mode file ( File Path / Multi File Path )**
 
-`Input File Path ( Support Host/Domain/SubDomain/CIDR/IP )`
+`Input File Path [ Support in File :- CIDR / IP / Host ( Domain / SubDomain )  ]`
 
-    BugScanX -f Your_TXT_Path.txt
+    BugScanX Your_TXT_Path.txt
     
 `Multi File`
 
-    BugScanX -f Your_TXT_Path.txt Your_TXT_Path_2.txt Your_TXT_Path_3.txt
+    BugScanX Your_TXT_Path.txt Your_TXT_Path_2.txt Your_TXT_Path_3.txt
 
-**Mode -c ( CIDR / IP-Range )**
+**Mode file ( CIDR & IP / Multi CIDR & IP )**
 
 `Input CIDR ( IP-Range )`
 
-    BugScanX -c 127.0.0.1/24
+    BugScanX 1.1.1.1/24
     
 `Multi CIDR`
 
-    BugScanX -c 127.0.0.1/24 128.0.0.0/24 104.18.25.0/30
+    BugScanX 1.1.1.1/24 1.0.0.1/24 104.16.0.0/30
+
+**Mode file [ HOST ( Domain & SubDomain ) ]**
+
+`Input HOST`
+
+    BugScanX www.cloudflare.com
+    
+`Multi HOST`
+
+    BugScanX www.cloudflare.com www.google.com
+
+`Mixed No Limit ( But Keep Space ) 🥱`
+
+    BugScanX scan.txt www.cloudflare.com google.com 1.0.0.1 1.1.1.1/30
+
 
 BugScanX ( Addition Flags )
 -----
 
-**Addition Flag -p ( Port ) with -f & -c**
+**Addition Flag -p ( Port )**
 
 `Input Port ( Defult is 80 )`
 
-    BugScanX -f subdomain.txt --p 443
+    BugScanX subdomain.txt --p 443
     
 `Multi Port`
     
-    BugScanX -f subdomain.txt --p 80 443 53
+    BugScanX subdomain.txt --p 80 443 53
 
 **Addition Flag -https**
 
-    BugScanX -f subdomain.txt -http
+    BugScanX subdomain.txt -http
     
 **Addition Flag -m ( Input Methods, Defult is HEAD ) [ GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE ]**
 
-    BugScanX -f subdomain.txt -m GET
+    BugScanX subdomain.txt -m GET
 
 **Addition Flag -rr ( RESPONSE Check )**
 
 `-rr Response Check`
 
-    BugScanX -f subdomain.txt -rr
+    BugScanX subdomain.txt -rr
 
 **Addition Flag -t ( TimeOut ) -T ( Thareds ) -o ( Output )**
 
 `-t ( Input Timeout, Defult is 3 )`
 
-    BugScanX -f subdomain.txt -t 3
+    BugScanX subdomain.txt -t 3
     
 `-T ( Input Thareds, Defult is 64)`
     
-    BugScanX -f subdomain.txt -T 100
+    BugScanX subdomain.txt -T 100
     
 `-o ( Disabled, Because Currently Forwarded to Default [ Default is /sdcard/ & $HOME ] )`
     
-    BugScanX -f subdomain.txt -o /sdcard/other_result.txt
+    BugScanX subdomain.txt -o /sdcard/other_result.txt
 
 BugScanX ( Other Mode )
 -----
@@ -139,7 +168,7 @@ BugScanX ( Other Mode )
 
 **Mode -r Reverse IP LookUp ( Input IP )**
 
-    BugScanX -r 127.0.0.1
+    BugScanX -r 1.1.1.1
 
 **Mode -s Sub Domains Finder ( Input Domain, NOTE Currently Supported Single Domain )**
 
