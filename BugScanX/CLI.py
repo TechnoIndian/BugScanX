@@ -1,29 +1,43 @@
-from .C_M import CM; C = CM()
+from .ANSI_COLORS import ANSI; C = ANSI()
+from .MODULES import IMPORT; M = IMPORT()
+
+from .ANSI_COLORS import ANSI; C = ANSI()
+from .MODULES import IMPORT; M = IMPORT()
 
 
-# ————— parse arguments —————
+# ————— 𝐩𝐚𝐫𝐬𝐞 𝐚𝐫𝐠𝐮𝐦𝐞𝐧𝐭𝐬 —————
 def parse_arguments():
     print()
-    class CustomArgumentParser(C.argparse.ArgumentParser):
+    class CustomArgumentParser(M.argparse.ArgumentParser):
+
+        def format_help(self):
+            help_text = super().format_help()
+            help_text = help_text.replace(f'{C.Y}➢', f'\n{" " * 22}{C.Y}➢')
+
+            return help_text
+
         def error(self, message):
-            exit(f'\nerror: {message}\n{next((action.help for action in self._actions if action.option_strings[0] in message), "")}\n')
+            exit(
+                f'\nerror: {message}\n'
+                f'{next((action.help for action in self._actions if action.option_strings and action.option_strings[0] in message), "")}\n'
+            )
 
-    parser = CustomArgumentParser(description=f'{C.C}BugScanX Script') if any(arg.startswith('-') for arg in C.sys.argv[1:]) else C.argparse.ArgumentParser(description=f'{C.C}BugScanX Script')
+    args = M.sys.argv[1:]
 
-    group = parser.add_mutually_exclusive_group(required=True)
+    if any(arg.startswith('-') for arg in args):
+        parser = CustomArgumentParser(description=f'{C.C}BugScanX Script')
+    else:
+        parser = M.argparse.ArgumentParser(description=f'{C.C}BugScanX Script')
 
-    group.add_argument(
-        '-c',
-        dest='CIDR',
-        nargs='+',
-        help=f'\n{C.Y}➸ {C.C}CIDR {C.G}127.0.0.0/24 {C.R}OR {C.C}Multi CIDR {C.G}127.0.0.0/24 104.0.0.0/24{C.C}'
-    )
+    group = parser.add_mutually_exclusive_group(required=False)
 
-    group.add_argument(
-        f'-f',
-        dest='file',
-        nargs='+',
-        help=f'\n{C.Y}➸ {C.C}File Path {C.Y}/sdcard/scan.txt {C.R}OR {C.C}Multi File {C.Y}/sdcard/scan1.txt /sdcard/scan2.txt{C.C}'
+    parser.add_argument(
+        'file',
+        nargs='*',
+        type=str,
+        help=f'{C.Y}➢ {C.C}File Path {C.Y}/sdcard/scan.txt {C.CC}OR {C.C}Multi File {C.Y}/sdcard/scan1.txt /sdcard/scan2.txt\n'
+              f'{C.Y}➢ {C.C}CIDR {C.G}127.0.0.0/24 {C.CC}OR {C.C}Multi CIDR {C.G}127.0.0.0/24 104.0.0.0/24{C.C}\n'
+              f'{C.Y}➢ {C.C}HOST / IP {C.G}www.google.com OR 1.1.1.1 {C.CC}OR {C.C}Multi CIDR / HOST {C.G}www.google.com www.cloudflare.com 1.1.1.2 1.1.1.0/30{C.C}'
     )
 
     group.add_argument(
@@ -78,7 +92,7 @@ def parse_arguments():
     additional.add_argument(
         '-https',
         action='store_true',
-        help=f'\n{C.Y}➸ {C.G}https mode ( Default is http ){C.C}'
+        help=f'\n{C.Y}➸ {C.G}https Mode ( Default is http ){C.C}'
     )
 
     additional.add_argument(
@@ -91,7 +105,7 @@ def parse_arguments():
     additional.add_argument(
         '-o',
         dest='output',
-        help=f'\n{C.Y}➸ {C.G} Disabled, Because currently forwarded to Default [ Default {C.Y}/sdcard/ {C.R}& {C.Y}$HOME {C.G}]{C.C}'
+        help=f'\n{C.Y}➸ {C.G} Disabled, Because currently forwarded to Default [ Default {C.Y}/sdcard/ {C.CC}& {C.Y}$HOME {C.G}]{C.C}'
     )
 
     additional.add_argument(
@@ -99,7 +113,7 @@ def parse_arguments():
         dest='PORT',
         nargs='+',
         default=['80'],
-        help=f'\n{C.Y}➸ {C.C}Input Port  {C.OG}➸{C.G} 80 {C.R}OR {C.C}Multi Port {C.OG}➸{C.G} 80 443 53 ( Default is 80 ){C.C}'
+        help=f'\n{C.Y}➸ {C.C}Input Port  {C.OG}➸{C.G} 80 {C.CC}OR {C.C}Multi Port {C.OG}➸{C.G} 80 443 53 ( Default is 80 ){C.C}'
     )
 
     additional.add_argument(
@@ -122,7 +136,12 @@ def parse_arguments():
         dest='threads',
         default=64,
         type=int,
-        help=f'\n{C.Y}➸ {C.G}Input Threads ( Default is 64 ){C.R}'
+        help=f'\n{C.Y}➸ {C.G}Input Threads ( Default is 64 ){C.CC}'
     )
+
+    if not args:
+        exit(parser.print_usage())
+    
+    print(f"\n{C.S}{C.Y} Input Path {C.E} {C.OG}➸❥{C.Y}", *args, f"\n\n{C.CC}{'_' * 61}\n")
 
     return parser.parse_args()

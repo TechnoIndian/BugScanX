@@ -1,18 +1,13 @@
-from .C_M import CM; C = CM()
+from .ANSI_COLORS import ANSI; C = ANSI()
+from .MODULES import IMPORT; M = IMPORT()
 
 
-# ————— logger Progress Line —————
+# ————— 𝐥𝐨𝐠𝐠𝐞𝐫 𝐏𝐫𝐨𝐠𝐫𝐞𝐬𝐬 𝐋𝐢𝐧𝐞 —————
 def logger(progress_line):
+    columns, _ = M.os.get_terminal_size()
 
-    try:
-        columns, _ = C.os.get_terminal_size()
-    except OSError:
-        columns = 80
-
-    Fix_Line = C.re.sub(r'\033\[[0-9;]*m', '', progress_line)
-
-    if len(Fix_Line) > columns:
+    if len(progress_line) > columns:
         progress_line = progress_line[:columns - 3] + '...'
 
-    C.sys.stdout.write(f'{progress_line}\r')
-    C.sys.stdout.flush()
+    M.sys.stdout.write(f'{C.CL}{C.CC}{progress_line}{C.CC}\r')
+    M.sys.stdout.flush()

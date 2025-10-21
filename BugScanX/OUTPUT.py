@@ -1,7 +1,7 @@
 import os
 
 
-# ————— OUTPUT —————
+# ————— 𝐎𝐔𝐓𝐏𝐔𝐓 —————
 def out_dir(File_Name):
 
     if os.name == 'posix':
