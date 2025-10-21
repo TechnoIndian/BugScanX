@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IPv6 Subnet Size Reference Table</title>
+    <style>
+        /* CSS Variables for maintainability */
+        :root {
+            --primary-bg: #f3e8ff; /* Light purple tone */
+            --table-header-bg: #d8b4fe; /* Slightly darker purple for header */
+            --table-row-bg: #fffbeb; /* Light yellow tone for rows */
+            --table-row-alt-bg: #fef3c7; /* Alternate yellow tone */
+            --box-bg: #ede9fe; /* Light purple for boxes */
+            --text-color: #333333;
+            --border-color: #d1d5db;
+            --highlight-residential: #dcfce7; /* Light green for /64 */
+            --highlight-business: #e0f2fe; /* Light blue for /48 */
+            --highlight-isp: #fee2e2; /* Light red for /32 */
+            --font-family: 'Arial', sans-serif;
+        }
+
+        /* General Styling */
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        /* Box Styling for Labels */
+        .label-box {
+            background-color: var(--box-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: var(--table-row-bg);
+            table-layout: fixed; /* Prevent excessive stretching */
+        }
+
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            word-wrap: break-word; /* Ensure long content wraps */
+        }
+
+        th {
+            background-color: var(--table-header-bg);
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        th.number-ips, td.number-ips {
+            text-align: center; /* Center Number of IPs */
+            width: 50%; /* Balanced column width */
+        }
+
+        td.subnet {
+            text-align: left; /* Left-align Subnet */
+            width: 50%; /* Balanced column width */
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--table-row-alt-bg);
+        }
+
+        /* Highlight specific rows */
+        tr.residential {
+            background-color: var(--highlight-residential);
+        }
+
+        tr.business {
+            background-color: var(--highlight-business);
+        }
+
+        tr.isp {
+            background-color: var(--highlight-isp);
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                width: 90%; /* Ensure container fits mobile screen */
+            }
+
+            table {
+                max-width: 100%;
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* Hover Effect */
+        tr:hover {
+            background-color: #e9d5ff; /* Light purple hover effect */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IPv6 Subnet Size Reference Table</h1>
+        <div class="label-box">Residential – /64</div>
+        <div class="label-box">Business – /48</div>
+        <div class="label-box">ISP – /32</div>
+        <table id="subnetTable">
+            <thead>
+                <tr>
+                    <th>Subnet</th>
+                    <th class="number-ips">Number of IPs</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Logic to generate subnet sizes dynamically
+        const tbody = document.querySelector('#subnetTable tbody');
+        for (let prefix = 128; prefix >= 8; prefix--) {
+            const numIPs = BigInt(2) ** BigInt(128 - prefix); // Calculate 2^(128 - prefix)
+            const row = document.createElement('tr');
+            if (prefix === 64) row.classList.add('residential');
+            if (prefix === 48) row.classList.add('business');
+            if (prefix === 32) row.classList.add('isp');
+            row.innerHTML = `
+                <td class="subnet">/${prefix}</td>
+                <td class="number-ips">${numIPs.toLocaleString()}</td>
+            `;
+            tbody.appendChild(row);
+        }
+    </script>
+</body>
+</html>
