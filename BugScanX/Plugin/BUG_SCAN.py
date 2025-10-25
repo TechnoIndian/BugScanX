@@ -1,10 +1,14 @@
-from ..ANSI_COLORS import ANSI; C = ANSI()
-from ..MODULES import IMPORT; M = IMPORT()
+import urllib3
+
 from ..Logger import logger
 from ..OUTPUT import out_dir
+from ..ANSI_COLORS import ANSI; C = ANSI()
+from ..MODULES import IMPORT; M = IMPORT()
 
 
 C_Line = f"{C.CC}{'_' * 61}"
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 EXCLUDE_LOCATION = 'https://jio.com/BalanceExhaust' # 𝐈𝐒𝐏 ( 𝐉𝐈𝐎 )
 
@@ -38,7 +42,7 @@ def isIPv6(HOST):
 
 
 # ————— 𝐢𝐬𝐈𝐏𝐯𝟒 𝐂𝐇𝐄𝐂𝐊 —————
-def isIPv4_IP(HOST):
+def getIPv4_IP(HOST):
 
     IPv4 = []
 
@@ -54,28 +58,37 @@ def isIPv4_IP(HOST):
         Threads.daemon = True
         Threads.start()
         Threads.join(3)
-    except Exception as e:
+
+    except Exception:
         pass
 
     return IPv4
 
 
 # ————— 𝐆𝐄𝐓 𝐋𝐎𝐂𝐀𝐋 𝐈𝐏 —————
-def isLOCAL_IP(version=4):
+def getLOCAL_IP():
 
-    # ————— 𝐈𝐏𝐯𝟔 & 𝐈𝐏𝐯𝟒 —————
-    try:
-        IP = M.socket.AF_INET6 if version == 6 else M.socket.AF_INET
+    LOCAL_IP = {}
 
-        addr = ("2606:4700:4700::1111", 80) if version == 6 else ("1.1.1.1", 80)
+    for version in [4, 6]:
+        try:
+            family = M.socket.AF_INET6 if version == 6 else M.socket.AF_INET
 
-        with M.socket.socket(IP, M.socket.SOCK_DGRAM) as sock:
-            sock.connect(addr)
+            add = ("2606:4700:4700::1111", 80) if version == 6 else ("1.1.1.1", 80)
 
-            return sock.getsockname()[0]
+            with M.socket.socket(family, M.socket.SOCK_DGRAM) as sock:
+                sock.connect(add)
 
-    except Exception:
-        return None
+                IP = sock.getsockname()[0]
+
+            key = "IPv6" if version == 6 else "IPv4"
+
+            LOCAL_IP[key] = IP
+
+        except Exception:
+            continue
+
+    return LOCAL_IP
 
 
 # ————— 𝐂𝐇𝐄𝐂𝐊 𝐇𝐓𝐓𝐏'𝐬 𝐑𝐄𝐒𝐏𝐎𝐍𝐒𝐄 —————
@@ -84,7 +97,7 @@ def isRequest(HOST, PORT, isTimeOut, Method='HEAD', isHTTPS=False):
     if isIP_Add(HOST):
         IP = [HOST]
     else:
-        IP = isIPv4_IP(HOST)
+        IP = getIPv4_IP(HOST)
 
     if not IP:
         return None
@@ -97,30 +110,22 @@ def isRequest(HOST, PORT, isTimeOut, Method='HEAD', isHTTPS=False):
         URL = f"{PROTOCOL}://{HOST}:{PORT}"
 
     try:
-        response = M.requests.request(Method, URL, timeout=isTimeOut, allow_redirects=False)
-
-        if EXCLUDE_LOCATION in response.headers.get('LOCATION', ''):
-            return None
+        response = M.requests.request(Method, URL, timeout=isTimeOut, verify=False, allow_redirects=False)
 
         STATUS = response.status_code
 
-        SERVER = response.headers.get('Server', '')
+        SERVER = response.headers.get('server', '')
 
-        LOCATION = response.headers.get('LOCATION')
+        LOCATION = response.headers.get('location', '')
+
+        if EXCLUDE_LOCATION in LOCATION:
+            return None
 
         if LOCATION:
             if LOCATION.startswith(f"https://{HOST}"):
                 STATUS = f"{C.P}{STATUS:<3}"
 
-        # ————— 𝐆𝐄𝐓 𝐋𝐎𝐂𝐀𝐋 𝐈𝐏 —————
-        Local_IP = {}
-        for version in [4, 6]:
-            IPvX = isLOCAL_IP(version)
-            if IPvX:
-                key = "IPv4" if version == 4 else "IPv6"
-                Local_IP[key] = IPvX
-
-        return IP, STATUS, SERVER, PORT, HOST, LOCATION, Local_IP
+        return IP, STATUS, SERVER, PORT, HOST, LOCATION
 
     except M.requests.exceptions.RequestException:
         return None
@@ -147,6 +152,7 @@ def isROW(IP, STATUS, SERVER, PORT, HOST, LOCATION):
     isLOCATION = f' {C.OG}-> {C.DG}{LOCATION}' if LOCATION else ''
 
     IPv6_IP = (IP[:10] + '...') if len(IP) > 15 else IP
+
     return (f"\r{C.CL}{color}{IPv6_IP:<15}   {STATUS:<3}   {color}{SERVER:<22}   {PORT:<4}   {HOST}{isLOCATION}")
 
 
@@ -155,7 +161,7 @@ def BugScaner(HOSTS, isTime, isTimeOut, PORTS=False, Output_Path=False, Threads=
 
     print(f'{"  IP Address":<14}   {"Status":<3}   {"Server":<20}   {"Port":<7}   {"Host"}')
 
-    print('---------------  ------ ----------              ------  -----------\n')
+    print('---------------  ------ ----------              ------  ----------\n')
 
     Total_HOST = len(HOSTS) * len(PORTS)
 
@@ -171,34 +177,36 @@ def BugScaner(HOSTS, isTime, isTimeOut, PORTS=False, Output_Path=False, Threads=
 
     Output_Path = out_dir("other_respond.txt")
 
-    
     with M.ThreadPoolExecutor(max_workers=Threads) as executor:
 
-        futures = {}
+        is_Request = {}
 
         for HOST in HOSTS:
             for PORT in PORTS:
-                future = executor.submit(isRequest, HOST, PORT, isTimeOut, Method, isHTTPS)
-                futures[future] = (HOST, PORT)
+                isHOST = executor.submit(isRequest, HOST, PORT, isTimeOut, Method, isHTTPS)
 
-        for future in M.as_completed(futures):
+                is_Request[isHOST] = (HOST, PORT)
+
+        for isHOST in M.as_completed(is_Request):
             Scanned_HOST += 1
-            CURRENT_HOST, _ = futures[future]
-            RESULT = future.result()
+            CURRENT_HOST, _ = is_Request[isHOST]
+            RESULT = isHOST.result()
 
             if RESULT:
                 Respond_HOST += 1
 
-                IP, STATUS, SERVER, PORT, HOST, LOCATION, Local_IP = RESULT
+                LOCAL_IP = getLOCAL_IP()
+
+                IP, STATUS, SERVER, PORT, HOST, LOCATION = RESULT
 
                 print(isROW(IP[0], STATUS, SERVER, PORT, HOST, LOCATION))
 
                 if 'cloudflare' in SERVER:
-                    isCloudFlare[HOST] = (IP, Local_IP)
+                    isCloudFlare[HOST] = (IP, LOCAL_IP)
                 elif 'CloudFront' in SERVER:
-                    isCloudFront[HOST] = (IP, Local_IP)
+                    isCloudFront[HOST] = (IP, LOCAL_IP)
                 else:
-                    Other_Responds.append((IP[0], STATUS, SERVER, HOST, Local_IP))
+                    Other_Responds.append((IP[0], STATUS, SERVER, HOST, LOCAL_IP))
 
             progress_line = (
                 f"- PC - {(Scanned_HOST / Total_HOST) * 100:.2f}% "
@@ -222,11 +230,14 @@ def BugScaner(HOSTS, isTime, isTimeOut, PORTS=False, Output_Path=False, Threads=
                 f"\n# 𝐈𝐧𝐩𝐮𝐭 𝐏𝐚𝐭𝐡 ➢ " + ' '.join(M.sys.argv[1:]) + Date_Time + f"\n\n# {Server_Name}\n"
             ]
 
-            for HOST, (IPs, isLocal_IP) in HOST_IP.items():
+            for HOST, (IPs, isLOCAL_IP) in HOST_IP.items():
 
-                print(f"{HOST} {C.PN}{isLocal_IP}{Color}")
+                print(f"{HOST} {C.PN}{isLOCAL_IP}{Color}")
 
-                Output_Logs.append(f"{HOST}\n# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {isLocal_IP}\n")
+                Output_Logs.append(
+                    f"{HOST}\n"
+                    f"# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {isLOCAL_IP}\n"
+                )
 
             if not isIP_Add(HOST):
                 Output_Logs.extend('\r')
@@ -266,15 +277,23 @@ def BugScaner(HOSTS, isTime, isTimeOut, PORTS=False, Output_Path=False, Threads=
 
         with open(Output_Path, 'a') as file:
 
-            file.write(f"\n# 𝐈𝐧𝐩𝐮𝐭 𝐏𝐚𝐭𝐡 ➢ " + ' '.join(M.sys.argv[1:]) + f" {Date_Time}\n\n")
+            file.write(
+                f"\n# 𝐈𝐧𝐩𝐮𝐭 𝐏𝐚𝐭𝐡 ➢ " + ' '.join(M.sys.argv[1:]) + f" {Date_Time}\n\n"
+            )
 
             for RESPONSE in Other_Responds:
-                IP, STATUS, SERVER, HOST, is_Local_IP = RESPONSE
+                IP, STATUS, SERVER, HOST, is_LOCAL_IP = RESPONSE
 
                 if isIP_Add(HOST):
-                    file.write(f"{IP} | {STATUS} | {SERVER}\n# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {is_Local_IP}\n\n")
+                    file.write(
+                        f"{IP} | {STATUS} | {SERVER}\n"
+                        f"# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {is_LOCAL_IP}\n\n"
+                    )
                 else:
-                    file.write(f"{IP} | {STATUS} | {SERVER} | {HOST}\n# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {is_Local_IP}\n\n")
+                    file.write(
+                        f"{IP} | {STATUS} | {SERVER} | {HOST}\n"
+                        f"# 𝐋𝐨𝐜𝐚𝐥 𝐈𝐏 ➢ {is_LOCAL_IP}\n\n"
+                    )
 
         print(
              f'\n{C.S}{C.C} Other Respond OUTPUT {C.E} {C.OG}︻デ═一 {C.Y}{Output_Path} {C.G}✔\n'
