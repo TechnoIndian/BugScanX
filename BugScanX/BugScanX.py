@@ -74,7 +74,7 @@ WARNING = False
 def isHOST_FILE(file_path):
 
     HOSTS = []
-    
+
     global WARNING
 
     try:
@@ -82,7 +82,7 @@ def isHOST_FILE(file_path):
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = [line.strip() for line in file.readlines() if line.strip()]
             lines = list(dict.fromkeys(lines))
-            
+
             for line in lines:
                 # ————— 𝐂𝐈𝐃𝐑 𝐢𝐧 𝐅𝐢𝐥𝐞 —————
                 if '/' in line:
@@ -90,14 +90,14 @@ def isHOST_FILE(file_path):
                 else:
                     # ————— 𝐈𝐏 & 𝐇𝐎𝐒𝐓 ( 𝐃𝐎𝐌𝐀𝐈𝐍 & 𝐒𝐔𝐁𝐃𝐎𝐌𝐀𝐈𝐍 ) 𝐢𝐧 𝐅𝐢𝐥𝐞 —————
                     HOSTS.append(line)
-    
+
     except (FileNotFoundError, IOError, OSError, ValueError):
         if not WARNING:
             print(
                   f'\n{C.INFO} {C.C} If File Path is Not Exist Then Consider {C.PN}CIDR / IP / HOST ( DOMAIN & SUBDOMAIN )\n'
                   f"\n{C.CC}{'_' * 61}\n"
             )
-            
+
             WARNING = True
 
         # ————— 𝐂𝐈𝐃𝐑 —————
@@ -109,7 +109,7 @@ def isHOST_FILE(file_path):
 
     except Exception as e:
         exit(f'\n{C.ERROR} {e}\n')
-    
+
     return HOSTS
 
 
@@ -133,11 +133,10 @@ def isTime(elapsed_time):
 
 # ————— 𝐄𝐱𝐞𝐜𝐮𝐭𝐞 𝐒𝐜𝐫𝐢𝐩𝐭 —————
 def RK_TECHNO_INDIA():
-    
+
     args = parse_arguments()
 
     HOSTS = []
-
 
     if args.file:
         for file_path in args.file:
@@ -193,7 +192,7 @@ def RK_TECHNO_INDIA():
 
         HOSTS, isTime,
         isTimeOut = args.timeout,
-        PORTS = args.PORT,
+        PORTS = args.port,
         Output_Path = args.output,
         Threads = args.threads,
         isHTTPS = args.https,

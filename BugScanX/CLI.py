@@ -107,7 +107,7 @@ def parse_arguments():
 
     additional.add_argument(
         '-p',
-        dest='PORT',
+        dest='port',
         nargs='+',
         default=['80'],
         help=f'\n{C.Y}➸ {C.C}Input Port  {C.OG}➸{C.G} 80 {C.CC}OR {C.C}Multi Port {C.OG}➸{C.G} 80 443 53 ( Default is 80 ){C.C}'
